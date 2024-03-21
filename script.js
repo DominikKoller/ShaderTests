@@ -7,9 +7,16 @@ import * as dat from 'dat.gui';
 const extraTexturePath = './AtriumCeiling.jpg';
 
 const settings = {
-    effectDuration: 4.0,
-    speed: 1.0,
+    effectDurationinTicks: 100.0,
     debug: false,
+    displacementStrength: 0.6,
+    noiseFrequency: 4.0,
+    noiseVelocity: 0.005,
+    rampAttack: .3,
+    rampSustain: .1,
+    rampDecay: .3,
+    progress: 0.0
+    // reflAlpha: 0.4
 
     // color: '#ffae23', // can use colors here like this
     // Add more settings you want to control
@@ -18,8 +25,14 @@ const settings = {
 window.onload = function() {
     const gui = new dat.GUI();
     
-    gui.add(settings, 'effectDuration', 0, 10); // Slider from 0 to 10
-    gui.add(settings, 'speed', 0, 2); // Slider from 0 to 2
+    gui.add(settings, 'effectDurationinTicks', 0, 1000.0);
+    gui.add(settings, 'displacementStrength', 0, 1.0); 
+    gui.add(settings, 'noiseFrequency', 0.0, 10.0); 
+    gui.add(settings, 'noiseVelocity', 0.0, 0.05); 
+    gui.add(settings, 'rampAttack', 0.0, 1.0); 
+    gui.add(settings, 'rampSustain', 0.0, 1.0); 
+    gui.add(settings, 'rampDecay', 0.0, 1.0); 
+    gui.add(settings, 'progress', 0.0, 1.0);
     gui.add(settings, 'debug'); // Checkbox
     // gui.addColor(settings, 'color'); // Color picker
 };
@@ -79,6 +92,12 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
             timeUniforms: {
                 uTime: { value: 0.0, type: 'f32' },
                 uProgress: { value: 0.0, type: 'f32'},
+                uNoiseFrequency: { value: 0.0, type: 'f32'},
+                uNoiseVelocity: { value: 0.0, type: 'f32'},
+                uRampAttack: { value: 0.0, type: 'f32'},
+                uRampSustain: { value: 0.0, type: 'f32'},
+                uRampDecay : { value: 0.0, type: 'f32'},
+                uDisplacementStrength: { value: 0.0, type: 'f32'},
                 uDebug: { value: settings.debug ? 1 : 0, type: 'i32' },
             },
             uExtraTexture: extraTexture.source,
@@ -88,8 +107,16 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
 
     app.ticker.add((ticker) =>
     {
-        invertFilter.resources.timeUniforms.uniforms.uTime += settings.speed * ticker.deltaTime;
-        invertFilter.resources.timeUniforms.uniforms.uProgress = Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uProgress + ticker.deltaTime / settings.effectDuration);
+        invertFilter.resources.timeUniforms.uniforms.uTime += ticker.deltaTime;
+        invertFilter.resources.timeUniforms.uniforms.uDisplacementStrength = settings.displacementStrength;
+        invertFilter.resources.timeUniforms.uniforms.uNoiseFrequency = settings.noiseFrequency;
+        invertFilter.resources.timeUniforms.uniforms.uNoiseVelocity = settings.noiseVelocity;
+        invertFilter.resources.timeUniforms.uniforms.uRampAttack = settings.rampAttack;
+        invertFilter.resources.timeUniforms.uniforms.uRampSustain = settings.rampSustain;
+        invertFilter.resources.timeUniforms.uniforms.uRampDecay = settings.rampDecay;
         invertFilter.resources.timeUniforms.uniforms.uDebug = settings.debug ? 1 : 0;
+        invertFilter.resources.timeUniforms.uniforms.uProgress = settings.debug ? settings.progress : Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uTime /  settings.effectDurationinTicks );
+        // console.log( invertFilter.resources.timeUniforms.uniforms.uTime);
+        // console.log( invertFilter.resources.timeUniforms.uniforms.uProgress);
     });
 }
