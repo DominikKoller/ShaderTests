@@ -2,6 +2,7 @@ in vec2 vTextureCoord;
 in vec4 vColor;
 
 uniform sampler2D uTexture;
+uniform sampler2D uExtraTexture;
 uniform float uTime;
 uniform float uProgress;
 uniform int uDebug;
@@ -19,5 +20,4 @@ void main(void)
     }
 
     gl_FragColor = fg;
-
 }

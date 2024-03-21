@@ -2,10 +2,10 @@ import * as PIXI from 'pixi.js';
 import html2canvas from 'html2canvas';
 import vertexShaderSource from './vertexShader.glsl?raw';
 import fragmentShaderSource from './fragmentShader.glsl?raw';
-import extraTexture from './extraTexture.png';
 
 const effectDuration = 4.0;
 const debug = false;
+const extraTexturePath = 'https://pixijs.com/assets/bg_scene_rotate.jpg';
 
 let activeApp; // Store the active app to destroy it later
 
@@ -51,6 +51,8 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
     sprite.scale.set(1 / devicePixelRatio);
     container.addChild(sprite);
 
+    const extraTexture = await PIXI.Assets.load(extraTexturePath);
+
     const invertFilter = new PIXI.Filter({
         glProgram: new PIXI.GlProgram({
             fragment: fragmentShaderSource,
@@ -62,6 +64,7 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
                 uProgress: { value: 0.0, type: 'f32'},
                 uDebug: { value: debug ? 1 : 0, type: 'i32' },
             },
+            uExtraTexture: extraTexture.source,
         },
     });
     sprite.filters = [invertFilter];
