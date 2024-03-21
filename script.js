@@ -5,7 +5,7 @@ import fragmentShaderSource from './fragmentShader.glsl?raw';
 
 const effectDuration = 4.0;
 const debug = false;
-const extraTexturePath = 'https://pixijs.com/assets/bg_scene_rotate.jpg';
+const extraTexturePath = './AtriumCeiling.jpg';
 
 let activeApp; // Store the active app to destroy it later
 
