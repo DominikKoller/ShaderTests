@@ -34,38 +34,52 @@ float noise(vec3 p){
 
 void main(void)
 {
-   
-    float noiseVelocity = 0.01;
-
+    
+    // Prelude
     vec4 fg = texture2D(uTexture, vTextureCoord);
-
-    float displacementStrength = .09;  
-          
-    float scaleUV = 8.0;
     vec2 uv = vTextureCoord.xy;
-
     vec2 noiseUV = uv;
 
+    // Parameters
+    float noiseVelocity = 0.5;
+    float displacementStrength = 0.1; 
+    float scaleUV = 8.0;
+
+
+    // – – – – – – – – – – – – – – M A S K I N G – – – – – – – – – – – – – – 
+    float rampWidth = 0.2;
+    float maskStart = 0.0;
+    float sustain = 0.4;
+    // make it loop
+    float offset = (uv.y + uv.x) / 2.0 - uTime * 0.1;
+    // offset = offset * 2.0 - 4.0;
+    offset = mod(offset, 1.0);
+    float mask = smoothstep(maskStart, maskStart+rampWidth, offset) - smoothstep(maskStart+rampWidth+sustain, maskStart+rampWidth*2.0+sustain, offset);
+   
+
+    // – – – – – – – – – – – – – – D I S T O R T I O N – – – – – – – – – – – – – – 
     // uniform scaling of noise
     noiseUV *= scaleUV;
 
-    // move noise
+    // animate noise
     float z = uTime * noiseVelocity;
-    noiseUV.x += uTime * noiseVelocity;
-    noiseUV.y += uTime * noiseVelocity;
+    // noiseUV.x += uTime * noiseVelocity;
+    // noiseUV.y += uTime * noiseVelocity;
 
     // calculate intensity of distortion at different places
     float intensity = noise(vec3(noiseUV, z));
+    intensity *= mask;
 
     // dispersion values
-    vec3 dispersion = vec3(1.00, 1.02, 1.05) * 3.0;
+    vec3 dispersion = vec3(1.00, 1.02, 1.05);
+    // relate dispersion to intensity of distortion = noise value
+    dispersion *=  pow(noise(vec3(noiseUV, 1.0)), 2.0) * 4.0;
 
-    // relate dispersion to intensity of distortion
-    dispersion *= intensity;
+    float noiseDebug = noise(vec3(noiseUV, z));
 
-    vec2 uv_r = uv + noise(vec3(noiseUV, dispersion.x)) * displacementStrength * intensity;
-    vec2 uv_g = uv + noise(vec3(noiseUV, dispersion.y)) * displacementStrength * intensity;
-    vec2 uv_b = uv + noise(vec3(noiseUV, dispersion.z)) * displacementStrength * intensity;
+    vec2 uv_r = uv + noise(vec3(noiseUV, z + dispersion.x)) * displacementStrength * intensity;
+    vec2 uv_g = uv + noise(vec3(noiseUV, z + dispersion.y)) * displacementStrength * intensity;
+    vec2 uv_b = uv + noise(vec3(noiseUV, z + dispersion.z)) * displacementStrength * intensity;
 
 
     float color_r = texture2D(uTexture, uv_r).r;
@@ -75,7 +89,7 @@ void main(void)
 
     vec4 color = vec4(color_r, color_g, color_b, 1.0);
     if(uDebug == 1) {
-        color = vec4(intensity, intensity, intensity, 1.0);
+        color = vec4(noiseDebug, noiseDebug, noiseDebug, 1.0);
     }
 
     gl_FragColor = color;
