@@ -3,6 +3,8 @@ import html2canvas from 'html2canvas';
 import vertexShaderSource from './vertexShader.glsl?raw';
 import fragmentShaderSource from './fragmentShader.glsl?raw';
 import extraTexture from './extraTexture.png';
+import vertex from './triangleTextured.vert?raw';
+import fragment from './triangleTextured.frag?raw';
 
 const effectDuration = 4.0;
 const debug = false;
@@ -36,6 +38,43 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
 
     app.canvas.style.width = `${ontoElement.offsetWidth}px`;
     app.canvas.style.height = `${ontoElement.offsetHeight}px`;
+
+    const triangleTexture = await PIXI.Assets.load('https://pixijs.com/assets/bg_scene_rotate.jpg');
+
+    const geometry = new PIXI.Geometry({
+        attributes: {
+            aPosition: [
+                -100,
+                -100, // x, y
+                100,
+                -100, // x, y
+                100,
+                100,
+            ], // x, y,,
+            aColor: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+            aUV: [0, 0, 1, 0, 1, 1],
+        },
+    });
+
+    const shader = PIXI.Shader.from({
+        gl: {
+            vertex,
+            fragment,
+        },
+        resources: {
+            uTexture: triangleTexture.source,
+        },
+    });
+
+    const triangle = new PIXI.Mesh({
+        geometry,
+        shader,
+    });
+
+    triangle.position.set(20, 20);
+
+    app.stage.addChild(triangle);
+    return;
 
     // Create texture from the canvas
     const texture = PIXI.Texture.from(canvas, {
