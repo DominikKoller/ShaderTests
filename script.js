@@ -15,7 +15,7 @@ document.getElementById("effect-button").onclick = () => {
     activeApp?.canvas?.remove();
     activeApp?.destroy(true);
 
-    html2canvas(message).then(canvas => {
+    html2canvas(message, {backgroundColor:"#000000"}).then(canvas => {
         drawCanvasWithPixi(canvas, message);
     });
 };
