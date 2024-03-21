@@ -2,10 +2,27 @@ import * as PIXI from 'pixi.js';
 import html2canvas from 'html2canvas';
 import vertexShaderSource from './vertexShader.glsl?raw';
 import fragmentShaderSource from './fragmentShader.glsl?raw';
+import * as dat from 'dat.gui';
 
-const effectDuration = 4.0;
-const debug = false;
 const extraTexturePath = './AtriumCeiling.jpg';
+
+const settings = {
+    effectDuration: 4.0,
+    speed: 1.0,
+    debug: false,
+
+    // color: '#ffae23', // can use colors here like this
+    // Add more settings you want to control
+  };
+  
+window.onload = function() {
+    const gui = new dat.GUI();
+    
+    gui.add(settings, 'effectDuration', 0, 1); // Slider from 0 to 1
+    gui.add(settings, 'speed', 0, 2); // Slider from 0 to 2
+    gui.add(settings, 'debug'); // Checkbox
+    // gui.addColor(settings, 'color'); // Color picker
+};
 
 let activeApp; // Store the active app to destroy it later
 
@@ -62,7 +79,7 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
             timeUniforms: {
                 uTime: { value: 0.0, type: 'f32' },
                 uProgress: { value: 0.0, type: 'f32'},
-                uDebug: { value: debug ? 1 : 0, type: 'i32' },
+                uDebug: { value: settings.debug ? 1 : 0, type: 'i32' },
             },
             uExtraTexture: extraTexture.source,
         },
@@ -71,7 +88,8 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
 
     app.ticker.add((ticker) =>
     {
-        invertFilter.resources.timeUniforms.uniforms.uTime += 0.04 * ticker.deltaTime;
-        invertFilter.resources.timeUniforms.uniforms.uProgress = Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uTime / effectDuration);
+        invertFilter.resources.timeUniforms.uniforms.uTime += settings.speed * ticker.deltaTime;
+        // invertFilter.resources.timeUniforms.uniforms.uProgress = Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uTime / settings.effectDuration);
+        invertFilter.resources.timeUniforms.uniforms.uProgress = Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uProgress + ticker.deltaTime / settings.effectDuration);
     });
 }
