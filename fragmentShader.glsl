@@ -2,6 +2,7 @@ in vec2 vTextureCoord;
 in vec4 vColor;
 
 uniform sampler2D uTexture;
+uniform sampler2D uExtraTexture;
 uniform float uTime;
 uniform float uProgress;
 uniform int uDebug;
@@ -82,7 +83,7 @@ void main(void)
     vec2 uv_b = uv + noise(vec3(noiseUV, z + dispersion.z)) * displacementStrength * intensity;
 
 
-    float color_r = texture2D(uTexture, uv_r).r;
+    float color_r = texture2D(uExtraTexture, uv_r).r; // I CHANGED THIS to try the extra texture
     float color_g = texture2D(uTexture, uv_g).g;
     float color_b = texture2D(uTexture, uv_b).b;
 
@@ -91,6 +92,6 @@ void main(void)
     if(uDebug == 1) {
         color = vec4(noiseDebug, noiseDebug, noiseDebug, 1.0);
     }
-
     gl_FragColor = color;
+
 }
