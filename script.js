@@ -18,7 +18,7 @@ const settings = {
 window.onload = function() {
     const gui = new dat.GUI();
     
-    gui.add(settings, 'effectDuration', 0, 1); // Slider from 0 to 1
+    gui.add(settings, 'effectDuration', 0, 10); // Slider from 0 to 10
     gui.add(settings, 'speed', 0, 2); // Slider from 0 to 2
     gui.add(settings, 'debug'); // Checkbox
     // gui.addColor(settings, 'color'); // Color picker
@@ -89,7 +89,7 @@ async function drawCanvasWithPixi(canvas, ontoElement) {
     app.ticker.add((ticker) =>
     {
         invertFilter.resources.timeUniforms.uniforms.uTime += settings.speed * ticker.deltaTime;
-        // invertFilter.resources.timeUniforms.uniforms.uProgress = Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uTime / settings.effectDuration);
         invertFilter.resources.timeUniforms.uniforms.uProgress = Math.min(1.0, invertFilter.resources.timeUniforms.uniforms.uProgress + ticker.deltaTime / settings.effectDuration);
+        invertFilter.resources.timeUniforms.uniforms.uDebug = settings.debug ? 1 : 0;
     });
 }
