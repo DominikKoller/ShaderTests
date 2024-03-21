@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import html2canvas from 'html2canvas';
 import vertexShaderSource from './vertexShader.glsl?raw';
 import fragmentShaderSource from './fragmentShader.glsl?raw';
+import extraTexture from './extraTexture.png';
 
 const effectDuration = 4.0;
 const debug = false;
